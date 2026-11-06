@@ -1,0 +1,27 @@
+{
+  "controller_type": "knuckles",
+  "description": "NSLT-VR default: sticks, triggers and A/B only (grips and trackpads unused)",
+  "name": "NSLT-VR default",
+  "bindings": {
+    "/actions/nslt": {
+      "sources": [
+        { "path": "/user/hand/left/input/thumbstick", "mode": "joystick",
+          "inputs": { "position": { "output": "/actions/nslt/in/stick_l" }, "click": { "output": "/actions/nslt/in/stickclick_l" } } },
+        { "path": "/user/hand/right/input/thumbstick", "mode": "joystick",
+          "inputs": { "position": { "output": "/actions/nslt/in/stick_r" }, "click": { "output": "/actions/nslt/in/stickclick_r" } } },
+        { "path": "/user/hand/left/input/trigger", "mode": "trigger",
+          "inputs": { "pull": { "output": "/actions/nslt/in/trigger_l" } } },
+        { "path": "/user/hand/right/input/trigger", "mode": "trigger",
+          "inputs": { "pull": { "output": "/actions/nslt/in/trigger_r" } } },
+        { "path": "/user/hand/left/input/a", "mode": "button", "inputs": { "click": { "output": "/actions/nslt/in/a_l" } } },
+        { "path": "/user/hand/right/input/a", "mode": "button", "inputs": { "click": { "output": "/actions/nslt/in/a_r" } } },
+        { "path": "/user/hand/left/input/b", "mode": "button", "inputs": { "click": { "output": "/actions/nslt/in/b_l" } } },
+        { "path": "/user/hand/right/input/b", "mode": "button", "inputs": { "click": { "output": "/actions/nslt/in/b_r" } } }
+      ],
+      "haptics": [
+        { "output": "/actions/nslt/out/haptic_l", "path": "/user/hand/left/output/haptic" },
+        { "output": "/actions/nslt/out/haptic_r", "path": "/user/hand/right/output/haptic" }
+      ]
+    }
+  }
+}

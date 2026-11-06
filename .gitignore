@@ -1,0 +1,23 @@
+# Build output (attach build\ contents to a GitHub Release instead)
+build/
+
+# Third-party binaries: downloaded by fetch-deps.ps1
+deps/BepInEx/
+deps/winhttp.dll
+deps/doorstop_config.ini
+deps/.doorstop_version
+deps/changelog.txt
+deps/openvr/openvr_api.dll
+
+# Local development / research material - never publish (contains decompiled game code and other people's repos)
+_tools/
+
+# Patcher build output
+patcher/*.exe
+patcher/*.pdb
+
+# Misc
+*.pdb
+*.log
+*.user
+.vs/

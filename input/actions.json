@@ -1,0 +1,42 @@
+{
+  "default_bindings": [
+    { "controller_type": "knuckles", "binding_url": "bindings_knuckles.json" },
+    { "controller_type": "oculus_touch", "binding_url": "bindings_oculus_touch.json" },
+    { "controller_type": "vive_controller", "binding_url": "bindings_vive_controller.json" }
+  ],
+  "action_sets": [
+    { "name": "/actions/nslt", "usage": "leftright" }
+  ],
+  "actions": [
+    { "name": "/actions/nslt/in/stick_l", "type": "vector2" },
+    { "name": "/actions/nslt/in/stick_r", "type": "vector2" },
+    { "name": "/actions/nslt/in/stickclick_l", "type": "boolean" },
+    { "name": "/actions/nslt/in/stickclick_r", "type": "boolean" },
+    { "name": "/actions/nslt/in/trigger_l", "type": "vector1" },
+    { "name": "/actions/nslt/in/trigger_r", "type": "vector1" },
+    { "name": "/actions/nslt/in/a_l", "type": "boolean" },
+    { "name": "/actions/nslt/in/a_r", "type": "boolean" },
+    { "name": "/actions/nslt/in/b_l", "type": "boolean" },
+    { "name": "/actions/nslt/in/b_r", "type": "boolean" },
+    { "name": "/actions/nslt/out/haptic_l", "type": "vibration" },
+    { "name": "/actions/nslt/out/haptic_r", "type": "vibration" }
+  ],
+  "localization": [
+    {
+      "language_tag": "en_US",
+      "/actions/nslt": "New Super Lucky's Tale VR",
+      "/actions/nslt/in/stick_l": "Move (left stick)",
+      "/actions/nslt/in/stick_r": "Camera (right stick)",
+      "/actions/nslt/in/stickclick_l": "Pause / Start (left stick click)",
+      "/actions/nslt/in/stickclick_r": "Recenter game camera (right stick click)",
+      "/actions/nslt/in/trigger_l": "Tail swipe / X (left trigger)",
+      "/actions/nslt/in/trigger_r": "Burrow (right trigger)",
+      "/actions/nslt/in/a_l": "Tail swipe / X (left lower button)",
+      "/actions/nslt/in/a_r": "Jump / A (right lower button)",
+      "/actions/nslt/in/b_l": "Interact / Y (left upper button)",
+      "/actions/nslt/in/b_r": "B (right upper button)",
+      "/actions/nslt/out/haptic_l": "Left rumble",
+      "/actions/nslt/out/haptic_r": "Right rumble"
+    }
+  ]
+}
