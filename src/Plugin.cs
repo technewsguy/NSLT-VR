@@ -20,7 +20,7 @@ namespace NSLTVR
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "nsltvr.mod";
-        public const string Version = "0.1.0";
+        public const string Version = "1.0.0";
 
         internal static ManualLogSource Log;
         internal static Plugin Instance;

@@ -12,12 +12,29 @@ you look down on a living diorama in true 3D while Lucky runs around in front of
 > Fan-made and unofficial. Not affiliated with or endorsed by Playful. You need your own copy of the game on Steam.
 > No game files are included in this repository.
 
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20this%20mod-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/technewsguy)
+
 ## Requirements
 
 - Windows 10/11 (64-bit), New Super Lucky's Tale from **Steam**
 - SteamVR and a PC VR headset. Tested on a Bigscreen Beyond with Valve Index controllers.
 
 ## Install
+
+### Easiest: the release download
+
+1. Download `NSLT-VR-vX.Y.Z.zip` from the [latest release](https://github.com/technewsguy/NSLT-VR/releases/latest).
+   Before unzipping, right-click it, choose **Properties**, tick **Unblock**, then click **OK**.
+2. Unzip it anywhere and close the game.
+3. Open PowerShell in the unzipped folder and run:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\install.ps1
+   ```
+   Everything is prebuilt, so nothing is downloaded or compiled.
+4. Optional: `powershell -ExecutionPolicy Bypass -File .\add-steam-vr-shortcut.ps1` adds the VR entry to Steam
+   (see step 3 below).
+
+### From source
 
 1. Download this repository: **Code > Download ZIP**, then unzip it, or `git clone` it.
 2. Close the game. Open PowerShell in the folder and run:
@@ -115,6 +132,10 @@ so the mod does what the SteamVR plugin did before Unity had VR built in:
 | `patcher\` | `globalgamemanagers` patcher |
 | `tools\` | Steam shortcut writer, SteamVR library cleanup |
 | `deps\openvr\openvr_api.cs` | Valve's OpenVR C# bindings (BSD-3-Clause) |
+
+## Support
+
+If you enjoy the mod, you can buy me a coffee on **[Ko-fi](https://ko-fi.com/technewsguy)**. Thank you!
 
 ## Credits
 

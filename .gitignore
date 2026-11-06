@@ -21,3 +21,6 @@ patcher/*.pdb
 *.log
 *.user
 .vs/
+
+# Release packages (made by make-release.ps1, uploaded to GitHub Releases)
+dist/
