@@ -64,6 +64,8 @@ To remove everything, run `uninstall.ps1`. Start SteamVR first so it can also re
 | **New Super Lucky's Tale** (Steam's normal entry) | The normal flat game |
 
 - Recenter the view: click both thumbsticks, or press **F8**.
+- A gamepad works for the game, but SteamVR's own menus (the dashboard) can only be clicked with VR controllers.
+  Launching through the **New Super Lucky's Tale VR** entry closes the dashboard for you.
 - The floating screen is about 1.4 m in front of you and turns to face you again if you look well away.
 - The VR mode starts the game with `-nsltvr`. That's the only thing that switches VR on.
 

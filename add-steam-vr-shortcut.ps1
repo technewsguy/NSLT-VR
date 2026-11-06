@@ -1,6 +1,6 @@
 # Adds "New Super Lucky's Tale VR" to the Steam library as a non-Steam game with "Include in VR Library" on, plus the
 # game's Steam artwork (cover, header, background, logo). It then shows in Steam's library and in SteamVR's library,
-# launches with -nsltvr (= VR mode in the mod), and Steam treats it as a VR game (no SteamVR "Resume Game" menu).
+# starts through SteamVR via the launcher (so no SteamVR "Resume Game" menu), and the game runs with -nsltvr (= VR mode).
 # Steam has to be closed while its shortcut list is edited; this script closes and restarts it.
 param([string]$GameDir = "")
 $ErrorActionPreference = 'Stop'
@@ -19,7 +19,11 @@ if (Get-Process steam -ErrorAction SilentlyContinue) {
     while (Get-Process steam -ErrorAction SilentlyContinue) { Start-Sleep 1 }
 }
 if ((Test-Path "$cfg\shortcuts.vdf") -and -not (Test-Path "$cfg\shortcuts.vdf.nsltvr-backup")) { Copy-Item "$cfg\shortcuts.vdf" "$cfg\shortcuts.vdf.nsltvr-backup" }
-$id = & $tool "$cfg\shortcuts.vdf" "New Super Lucky's Tale VR" "$GameDir\nslt.exe" $GameDir "$GameDir\nslt.exe" "-nsltvr" 1
+# Points at the launcher, which asks SteamVR to start the game: SteamVR then closes its dashboard (a game started any
+# other way stays behind the "Resume Game" menu if the dashboard was already open). "-" = no launch options.
+$launcher = "$GameDir\NSLTVR-launcher\nsltvr-launch.exe"
+if (-not (Test-Path $launcher)) { throw "Run install.ps1 first (it installs $launcher)." }
+$id = & $tool "$cfg\shortcuts.vdf" "New Super Lucky's Tale VR" $launcher "$GameDir\NSLTVR-launcher" "$GameDir\nslt.exe" "-" 1
 $art = "$steam\appcache\librarycache\1038300"
 New-Item -ItemType Directory -Force "$cfg\grid" | Out-Null
 $pairs = @{ "library_header.jpg" = "$id.jpg"; "library_600x900.jpg" = "${id}p.jpg"; "library_hero.jpg" = "${id}_hero.jpg"; "logo.png" = "${id}_logo.png" }
