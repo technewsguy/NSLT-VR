@@ -24,6 +24,9 @@ if ((Test-Path "$cfg\shortcuts.vdf") -and -not (Test-Path "$cfg\shortcuts.vdf.ns
 $launcher = "$GameDir\NSLTVR-launcher\nsltvr-launch.exe"
 if (-not (Test-Path $launcher)) { throw "Run install.ps1 first (it installs $launcher)." }
 $id = & $tool "$cfg\shortcuts.vdf" "New Super Lucky's Tale VR" $launcher "$GameDir\NSLTVR-launcher" "$GameDir\nslt.exe" "-" 1
+# The desktop shortcut hands over to this Steam entry (gamepads via Steam Input only reach games Steam started).
+$gameId = ([uint64]$id -shl 32) -bor 0x02000000
+Set-Content "$GameDir\NSLTVR-launcher\steam_gameid.txt" $gameId
 $art = "$steam\appcache\librarycache\1038300"
 New-Item -ItemType Directory -Force "$cfg\grid" | Out-Null
 $pairs = @{ "library_header.jpg" = "$id.jpg"; "library_600x900.jpg" = "${id}p.jpg"; "library_hero.jpg" = "${id}_hero.jpg"; "logo.png" = "${id}_logo.png" }

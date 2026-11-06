@@ -164,6 +164,12 @@ namespace NSLTVR
                 string appId = System.IO.Path.Combine(gameDir, "steam_appid.txt");
                 if (!System.IO.File.Exists(appId)) System.IO.File.WriteAllText(appId, "1038300");
                 string manifest = System.IO.Path.Combine(dir, "nsltvr.vrmanifest");
+                // The launcher starts the game itself (so Steam Input gamepads work when Steam started it) and only asks
+                // SteamVR to "launch" this entry, with --noop, because that makes SteamVR close its dashboard.
+                // Without the launcher, the entry starts the game directly in VR.
+                string launchBin = System.IO.Path.Combine(gameDir, @"NSLTVR-launcher\nsltvr-launch.exe");
+                string launchDir = System.IO.Path.GetDirectoryName(launchBin), launchArgs = "--noop";
+                if (!System.IO.File.Exists(launchBin)) { launchBin = exePath; launchDir = gameDir; launchArgs = Plugin.VRArgument; }
                 // Artwork, the same two images Steam gives its own VR games: the wide header (SteamVR's "Up Next" launch
                 // screen and wide tiles) and the tall 600x900 capsule (library tiles). Copied from Steam's local cache.
                 string image = SteamArt(dir, "library_header.jpg", "nsltvr_header.jpg", "header.jpg");
@@ -172,9 +178,9 @@ namespace NSLTVR
                     "{\n  \"source\": \"builtin\",\n  \"applications\": [{\n" +
                     "    \"app_key\": \"" + VRAppKey + "\",\n" +
                     "    \"launch_type\": \"binary\",\n" +
-                    "    \"binary_path_windows\": \"" + exePath.Replace("\\", "\\\\") + "\",\n" +
-                    "    \"working_directory\": \"" + gameDir.Replace("\\", "\\\\") + "\",\n" +
-                    "    \"arguments\": \"" + Plugin.VRArgument + "\",\n" +
+                    "    \"binary_path_windows\": \"" + launchBin.Replace("\\", "\\\\") + "\",\n" +
+                    "    \"working_directory\": \"" + launchDir.Replace("\\", "\\\\") + "\",\n" +
+                    "    \"arguments\": \"" + launchArgs + "\",\n" +
                     "    \"is_dashboard_overlay\": false,\n" +
                     "    \"image_path\": \"" + image + "\",\n" +
                     "    \"image_path_capsule\": \"" + capsule + "\",\n" +
