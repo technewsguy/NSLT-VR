@@ -20,7 +20,7 @@ namespace NSLTVR
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "nsltvr.mod";
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
 
         internal static ManualLogSource Log;
         internal static Plugin Instance;
@@ -119,7 +119,7 @@ namespace NSLTVR
             EnableControllers = Config.Bind("Controllers", "Enable", true,
                 "Play with motion controllers (they act as a gamepad; a real gamepad keeps working too). Layout: left stick move, right stick camera, " +
                 "right A = A (jump), right B = B, right trigger = gamepad left trigger, left trigger or left A = X, left B = Y, " +
-                "left stick click = Start (pause), right stick click recenter game camera, both stick clicks recenter VR view.");
+                "right stick click = Start (pause), left stick click recenter game camera, both stick clicks recenter VR view.");
             ShowControllers = Config.Bind("Controllers", "ShowControllers", true, "Draw faint ghost versions of your motion controllers in VR.");
             ControlsGuide = Config.Bind("Controllers", "ControlsGuide", ControlsGuideMode.TitleScreenAndPause,
                 "Labels next to each controller button saying what it does. TitleScreenAndPause = on the title screen and whenever the pause menu is open; TitleScreen; Always; Never.");

@@ -92,7 +92,7 @@ The controllers act as a gamepad, and a real gamepad also works. Grips and track
 | Left controller | | Right controller | |
 |---|---|---|---|
 | Stick | Move | Stick | Camera |
-| Stick click | Pause (Start) | Stick click | Center camera |
+| Stick click | Center camera | Stick click | Pause (Start) |
 | A | Tail swipe (X) | A | Jump / select (A) |
 | B | Interact (Y) | B | Back (B) |
 | Trigger | Tail swipe (X) | Trigger | Burrow |

@@ -70,14 +70,14 @@ namespace NSLTVR
         {
             new Label { Part = "button_b",   Offset = new Vector3( 0.075f,  0.075f, 0f), Text = "B  =  Interact (Y)" },
             new Label { Part = "button_a",   Offset = new Vector3( 0.075f,  0.035f, 0f), Text = "A  =  Tail swipe (X)" },
-            new Label { Part = "thumbstick", Offset = new Vector3(-0.075f,  0.065f, 0f), Text = "Stick  =  Move\nClick  =  Pause" },
+            new Label { Part = "thumbstick", Offset = new Vector3(-0.075f,  0.065f, 0f), Text = "Stick  =  Move\nClick  =  Center camera" },
             new Label { Part = "trigger",    Offset = new Vector3(-0.075f, -0.035f, 0f), Text = "Trigger  =  Tail swipe (X)" },
         };
         private static readonly Label[] RightLabels =
         {
             new Label { Part = "button_b",   Offset = new Vector3(-0.075f,  0.075f, 0f), Text = "B  =  Back (B)" },
             new Label { Part = "button_a",   Offset = new Vector3(-0.075f,  0.035f, 0f), Text = "A  =  Jump / Select" },
-            new Label { Part = "thumbstick", Offset = new Vector3( 0.075f,  0.065f, 0f), Text = "Stick  =  Camera\nClick  =  Center camera" },
+            new Label { Part = "thumbstick", Offset = new Vector3( 0.075f,  0.065f, 0f), Text = "Stick  =  Camera\nClick  =  Pause" },
             new Label { Part = "trigger",    Offset = new Vector3( 0.075f, -0.035f, 0f), Text = "Trigger  =  Burrow" },
         };
 

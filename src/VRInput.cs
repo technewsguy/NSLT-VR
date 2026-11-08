@@ -277,8 +277,8 @@ namespace NSLTVR
     //   Right A     -> jump (A)        Right B      -> B (jump / back in menus)
     //   Right trig. -> tail swipe (X)  Left A (X)   -> interact (Y)
     //   Left trig.  -> burrow (LT)     Grips        -> burrow (RT)
-    //   Left B (Y)  -> pause (Start)   Left stick click -> Back / map
-    //   Right stick click -> recenter game camera
+    //   Right stick click -> pause (Start)   Left stick click -> recenter game camera
+    //   Both stick clicks together -> recenter the VR view
     internal class VRControllerDevice : InputDevice
     {
         private const float Lower = 0.2f;
@@ -328,7 +328,7 @@ namespace NSLTVR
             Stick(InputControlType.RightStickLeft, InputControlType.RightStickRight, InputControlType.RightStickUp, InputControlType.RightStickDown, r.Stick, tick, dt);
 
             // Layout (user-tuned): right trigger = gamepad left trigger, left trigger / left A = X, left B = Y,
-            // left stick click = Start (pause).
+            // right stick click = Start (pause), left stick click = recenter game camera.
             UpdateWithValue(InputControlType.LeftTrigger, r.Trigger, tick, dt);
             UpdateWithValue(InputControlType.RightTrigger, (l.Grip || r.Grip) ? 1f : 0f, tick, dt);
 
@@ -336,9 +336,9 @@ namespace NSLTVR
             UpdateWithState(InputControlType.Action2, r.B, tick, dt);
             UpdateWithState(InputControlType.Action3, l.TriggerClick || l.A, tick, dt);
             UpdateWithState(InputControlType.Action4, l.B, tick, dt);
-            UpdateWithState(InputControlType.Start, l.StickClick && !r.StickClick, tick, dt);
+            UpdateWithState(InputControlType.Start, r.StickClick && !l.StickClick, tick, dt);
             UpdateWithState(InputControlType.Back, false, tick, dt);
-            UpdateWithState(InputControlType.RightStickButton, r.StickClick && !l.StickClick, tick, dt);
+            UpdateWithState(InputControlType.RightStickButton, l.StickClick && !r.StickClick, tick, dt);
 
             UpdateWithState(InputControlType.DPadUp, false, tick, dt);
             UpdateWithState(InputControlType.DPadDown, false, tick, dt);
