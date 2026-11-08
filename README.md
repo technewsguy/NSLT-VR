@@ -34,6 +34,22 @@ you look down on a living diorama in true 3D while Lucky runs around in front of
 4. Optional: `powershell -ExecutionPolicy Bypass -File .\add-steam-vr-shortcut.ps1` adds the VR entry to Steam
    (see step 3 below).
 
+### With UniGetUI or Scoop
+
+NSLT-VR is also in the [technewsguy/scoop-vr-mods](https://github.com/technewsguy/scoop-vr-mods) bucket, so
+[UniGetUI](https://github.com/marticliment/UniGetUI) (formerly WingetUI) or [Scoop](https://scoop.sh) can install it and keep it up to date:
+
+- **UniGetUI:** Settings > Package managers > Scoop > Buckets, add `vrmods` with the URL
+  `https://github.com/technewsguy/scoop-vr-mods`, then search for `nslt-vr` and install it.
+- **Command line:**
+  ```powershell
+  scoop bucket add vrmods https://github.com/technewsguy/scoop-vr-mods
+  scoop install vrmods/nslt-vr
+  ```
+
+It finds the game through Steam and runs the same installer. **NSLT-VR - Add to Steam** in the Start menu adds the
+Steam entry (step 4 above). Uninstalling the package removes the mod again.
+
 ### From source
 
 1. Download this repository: **Code > Download ZIP**, then unzip it, or `git clone` it.
