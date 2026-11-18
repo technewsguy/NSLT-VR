@@ -7,7 +7,8 @@ you look down on a living diorama in true 3D while Lucky runs around in front of
 - Menus, HUD, dialogue and loading tips on a floating screen in front of you
 - Motion-controller support (Index, Touch, Vive wands), or a normal gamepad
 - Faint "ghost" controllers in VR, with button labels on the title screen and in the pause menu, like the original game
-- Its own **New Super Lucky's Tale VR** shortcut; Steam's normal entry still plays the flat game
+- One-click installer. Afterwards you play from Steam's normal **New Super Lucky's Tale** entry, which also shows
+  under **VR** in the SteamVR library
 
 > Fan-made and unofficial. Not affiliated with or endorsed by Playful. You need your own copy of the game on Steam.
 > No game files are included in this repository.
@@ -16,23 +17,38 @@ you look down on a living diorama in true 3D while Lucky runs around in front of
 
 ## Requirements
 
-- Windows 10/11 (64-bit), New Super Lucky's Tale from **Steam**
+- New Super Lucky's Tale from **Steam**, on Windows 10/11 (64-bit) or Linux (Proton)
 - SteamVR and a PC VR headset. Tested on a Bigscreen Beyond with Valve Index controllers.
 
 ## Install
 
-### Easiest: the release download
+### Windows
 
-1. Download `NSLT-VR-vX.Y.Z.zip` from the [latest release](https://github.com/technewsguy/NSLT-VR/releases/latest).
-   Before unzipping, right-click it, choose **Properties**, tick **Unblock**, then click **OK**.
-2. Unzip it anywhere and close the game.
-3. Open PowerShell in the unzipped folder and run:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\install.ps1
+1. Download `NSLT-VR-Setup-vX.Y.Z.exe` from the [latest release](https://github.com/technewsguy/NSLT-VR/releases/latest).
+2. Close the game and double-click the installer. It finds the game in your Steam libraries (or use **Browse...**)
+   and installs with one click. If Windows SmartScreen warns about an unknown app, click **More info > Run anyway**.
+3. If Steam is open, the installer offers to restart it so the game shows up in SteamVR's **VR** library tab.
+   If you say no, it's listed the next time Steam closes.
+
+The installer puts the BepInEx mod loader and the mod into the game folder and turns on the game's dormant OpenVR
+support (a small patch to `nslt_Data\globalgamemanagers`; a backup is kept).
+
+To remove the mod, run **NSLT-VR Uninstall.exe** in the game folder (or the setup exe again and click **Uninstall**).
+It puts back everything it changed.
+
+### Linux / Steam Deck
+
+1. Download the same `NSLT-VR-Setup-vX.Y.Z.exe`. In Steam, use **Add a Non-Steam Game** to add it, then in its
+   **Properties > Compatibility**, choose Proton. Start it from Steam, and it finds the game in your Linux Steam
+   libraries.
+2. In Steam, right-click **New Super Lucky's Tale > Properties > Launch Options** and enter
+   (the installer has a **Copy launch option** button for this):
    ```
-   Everything is prebuilt, so nothing is downloaded or compiled.
-4. Optional: `powershell -ExecutionPolicy Bypass -File .\add-steam-vr-shortcut.ps1` adds the VR entry to Steam
-   (see step 3 below).
+   WINEDLLOVERRIDES="winhttp=n,b" %command%
+   ```
+   Without it, Proton doesn't load the mod and the game starts flat.
+
+VR needs SteamVR for Linux. The listing under SteamVR's **VR** library tab is Windows only.
 
 ### With UniGetUI or Scoop
 
@@ -47,43 +63,31 @@ NSLT-VR is also in the [technewsguy/scoop-vr-mods](https://github.com/technewsgu
   scoop install vrmods/nslt-vr
   ```
 
-It finds the game through Steam and runs the same installer. **NSLT-VR - Add to Steam** in the Start menu adds the
-Steam entry (step 4 above). Uninstalling the package removes the mod again.
+It runs the same installer silently. Uninstalling the package removes the mod again.
+
+### Command line
+
+`NSLT-VR-Setup.exe /S` installs silently (log in `%TEMP%\nsltvr-setup.log`). Add `/UNINSTALL` to remove the mod, and
+`/GAMEDIR="X:\...\steamapps\common\New Super Luckys Tale"` if the game isn't found.
 
 ### From source
 
 1. Download this repository: **Code > Download ZIP**, then unzip it, or `git clone` it.
-2. Close the game. Open PowerShell in the folder and run:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\build.ps1
-   powershell -ExecutionPolicy Bypass -File .\install.ps1
-   ```
-   - `build.ps1` finds the game through Steam and downloads [BepInEx 5.4.23.6](https://github.com/BepInEx/BepInEx) and Valve's
-     [openvr_api.dll 1.14.15](https://github.com/ValveSoftware/openvr) into `deps\`. It then compiles the mod with the
-     C# compiler built into Windows, so no SDK is needed.
-   - `install.ps1` installs BepInEx and the mod into the game folder and turns on the game's dormant OpenVR support
-     (a small patch to `nslt_Data\globalgamemanagers`; a backup is kept). It also creates a
-     **New Super Lucky's Tale VR** shortcut on your desktop and in the Start menu.
+2. Open PowerShell in the folder and run `powershell -ExecutionPolicy Bypass -File .\build.ps1`.
+   - It finds the game through Steam and downloads [BepInEx 5.4.23.6](https://github.com/BepInEx/BepInEx) and Valve's
+     [openvr_api.dll 1.14.15](https://github.com/ValveSoftware/openvr) into `deps\`. It then compiles the mod and
+     `build\NSLT-VR-Setup.exe` with the C# compiler built into Windows, so no SDK is needed.
    - If the game isn't found automatically, add `-GameDir "X:\...\steamapps\common\New Super Luckys Tale"`.
-3. Optional: run `add-steam-vr-shortcut.ps1` to add **New Super Lucky's Tale VR** to your **Steam** library, with the
-   game's artwork. Because it is marked for the VR library, it also appears in **SteamVR's** library. This script closes
-   and restarts Steam, since Steam only reads its non-Steam games at startup. Your other shortcuts are kept, and a
-   backup is saved as `shortcuts.vdf.nsltvr-backup`.
-
-To remove everything, run `uninstall.ps1`. Start SteamVR first so it can also remove the SteamVR library entry.
+3. Run `build\NSLT-VR-Setup.exe`. `make-release.ps1` makes the release files in `dist\`.
 
 ## Playing
 
-| Start from | You get |
-|---|---|
-| **New Super Lucky's Tale VR** (desktop, Steam or SteamVR library) | VR. SteamVR is started if needed |
-| **New Super Lucky's Tale** (Steam's normal entry) | The normal flat game |
+Start **New Super Lucky's Tale** from Steam, on the desktop or in the headset, and it plays in VR. SteamVR is
+started if needed. To play flat again, set `[General] EnableVR = false` in the settings, or uninstall the mod.
 
 - Recenter the view: click both thumbsticks, or press **F8**.
 - A gamepad works for the game, but SteamVR's own menus (the dashboard) can only be clicked with VR controllers.
-  Launching through the **New Super Lucky's Tale VR** entry closes the dashboard for you.
 - The floating screen is about 1.4 m in front of you and turns to face you again if you look well away.
-- The VR mode starts the game with `-nsltvr`. That's the only thing that switches VR on.
 
 ### Controls (motion controllers)
 
@@ -111,7 +115,7 @@ Click both sticks together to recenter the VR view. The buttons can be remapped 
 | `[Controllers] ShowControllers` / `ControllerVisibility` | true / 0.35 | Ghost controllers and how visible they are |
 | `[Controllers] ControlsGuide` | TitleScreenAndPause | When the button labels show: `TitleScreen`, `Always`, `Never` |
 | `[Camera] SharedReflectionView` | true | Uses the original Lucky's Tale VR shader mode for consistent reflections |
-| `[General] VROnlyFromVRShortcut` | true | `false` = always start in VR |
+| `[General] EnableVR` | true | `false` = the normal flat game, with the mod still installed |
 
 ## How it works
 
@@ -131,9 +135,10 @@ so the mod does what the SteamVR plugin did before Unity had VR built in:
   - Menu layering is preserved.
 - **Input** (`src\VRInput.cs`, `input\*.json`): SteamVR Input actions feed an InControl device that looks like an
   Xbox pad to the game.
-- **Launching**: Steam treats the game as flat and would open SteamVR's "Resume Game" menu over it. The mod registers
-  a SteamVR app (`nsltvr.mod.game`), and the shortcuts start the game through SteamVR or as a Steam VR-library entry,
-  which avoids that menu. `steam_appid.txt` lets the game start directly without restarting through Steam.
+- **Steam's VR library**: Steam decides whether a game is a VR game from the type of its launch options. The
+  installer marks the game's launch option as a VR launch (`type = vr`) in Steam's local copy of the game's info
+  (`appcache\appinfo.vdf`, edited while Steam is closed, with a backup). When Valve updates the game's store info,
+  Steam resets it; the mod notices at launch and marks it again after Steam closes.
 - **Quitting**: after VR frames have been submitted, this Unity version hangs during engine shutdown, after the game
   has already saved. A small external command closes the process 6 seconds after quitting if it is still running.
 
@@ -146,9 +151,8 @@ so the mod does what the SteamVR plugin did before Unity had VR built in:
 | `src\VRInput.cs` | Controllers → gamepad, haptics |
 | `src\VRController.cs`, `src\BaselineVR.cs` | Old Unity-XR renderer and troubleshooting stages (`[Debug] BaselineStage`) |
 | `input\` | SteamVR Input action manifest and default bindings |
-| `launcher\` | The desktop shortcut's launcher |
-| `patcher\` | `globalgamemanagers` patcher |
-| `tools\` | Steam shortcut writer, SteamVR library cleanup |
+| `installer\` | Installer/uninstaller (`Setup.cs`) and the SteamVR library listing (`SteamVRTag.cs`) |
+| `patcher\` | `globalgamemanagers` patcher (built into the installer) |
 | `deps\openvr\openvr_api.cs` | Valve's OpenVR C# bindings (BSD-3-Clause) |
 
 ## Support

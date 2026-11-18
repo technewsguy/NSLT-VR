@@ -67,7 +67,7 @@ namespace NSLTVR
             var sw = System.Diagnostics.Stopwatch.StartNew();
             OpenVR.Init(ref err, EVRApplicationType.VRApplication_Scene);
             long tInit = sw.ElapsedMilliseconds;
-            if (err == EVRInitError.None && Plugin.RegisterInSteamVR.Value) RegisterInSteamVRLibrary();
+            if (err == EVRInitError.None) RemoveOldLibraryEntry();
             if (err == EVRInitError.None)
             {
                 _initAt = Time.realtimeSinceStartup;
@@ -127,103 +127,25 @@ namespace NSLTVR
                 w, h, _tan[0][0], _tan[0][1], _tan[0][2], _tan[0][3], _eyePos[1].x - _eyePos[0].x));
         }
 
-        // Launched by Steam, the game is "Steam app 1038300": a flat game, so Steam opens SteamVR's dashboard
-        // ("Resume Game" menu) over it at every launch, and nothing a running app can call closes it. Launched from
-        // SteamVR's own library as a VR app, SteamVR clears its dashboard itself (tested). So every run registers
-        // "New Super Lucky's Tale VR" in SteamVR's library, which starts nslt.exe directly; steam_appid.txt stops the
-        // game from restarting itself through Steam when started that way (Steam features such as cloud saves still work).
-        internal const string VRAppKey = "nsltvr.mod.game";
+        // Up to v1.0.2 the mod played VR only from its own "New Super Lucky's Tale VR" entry in SteamVR's library
+        // (app key nsltvr.mod.game). Since v1.1 Steam's normal entry plays in VR, so that entry is removed again.
+        private const string OldVRAppKey = "nsltvr.mod.game";
 
-        // Local copy of one of Steam's cached images for the game (JSON-escaped path), or the same image on Steam's CDN.
-        private static string SteamArt(string dir, string cacheName, string localName, string cdnName)
-        {
-            try
-            {
-                string local = System.IO.Path.Combine(dir, localName);
-                if (!System.IO.File.Exists(local))
-                {
-                    string steam = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
-                    string cached = steam != null ? System.IO.Path.Combine(steam, @"appcache\librarycache\1038300\" + cacheName) : null;
-                    if (cached != null && System.IO.File.Exists(cached)) System.IO.File.Copy(cached, local);
-                }
-                if (System.IO.File.Exists(local)) return local.Replace("\\", "\\\\");
-            }
-            catch (Exception) { }
-            return "https://shared.steamstatic.com/store_item_assets/steam/apps/1038300/" + cdnName;
-        }
-
-        // Writes the SteamVR library entry file (no SteamVR needed): starts nslt.exe with -nsltvr, which is what turns
-        // VR on (see Plugin.LaunchedFromVRShortcut). SteamVR re-reads registered manifests when it starts.
-        internal static string WriteVRManifest()
+        private static void RemoveOldLibraryEntry()
         {
             try
             {
                 string dir = System.IO.Path.GetDirectoryName(typeof(Plugin).Assembly.Location);
-                string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-                string gameDir = System.IO.Path.GetDirectoryName(exePath);
-                string appId = System.IO.Path.Combine(gameDir, "steam_appid.txt");
-                if (!System.IO.File.Exists(appId)) System.IO.File.WriteAllText(appId, "1038300");
                 string manifest = System.IO.Path.Combine(dir, "nsltvr.vrmanifest");
-                // The launcher starts the game itself (so Steam Input gamepads work when Steam started it) and only asks
-                // SteamVR to "launch" this entry, with --noop, because that makes SteamVR close its dashboard.
-                // Without the launcher, the entry starts the game directly in VR.
-                string launchBin = System.IO.Path.Combine(gameDir, @"NSLTVR-launcher\nsltvr-launch.exe");
-                string launchDir = System.IO.Path.GetDirectoryName(launchBin), launchArgs = "--noop";
-                if (!System.IO.File.Exists(launchBin)) { launchBin = exePath; launchDir = gameDir; launchArgs = Plugin.VRArgument; }
-                // Artwork, the same two images Steam gives its own VR games: the wide header (SteamVR's "Up Next" launch
-                // screen and wide tiles) and the tall 600x900 capsule (library tiles). Copied from Steam's local cache.
-                string image = SteamArt(dir, "library_header.jpg", "nsltvr_header.jpg", "header.jpg");
-                string capsule = SteamArt(dir, "library_600x900.jpg", "nsltvr_capsule.jpg", "library_600x900.jpg");
-                System.IO.File.WriteAllText(manifest,
-                    "{\n  \"source\": \"builtin\",\n  \"applications\": [{\n" +
-                    "    \"app_key\": \"" + VRAppKey + "\",\n" +
-                    "    \"launch_type\": \"binary\",\n" +
-                    "    \"binary_path_windows\": \"" + launchBin.Replace("\\", "\\\\") + "\",\n" +
-                    "    \"working_directory\": \"" + launchDir.Replace("\\", "\\\\") + "\",\n" +
-                    "    \"arguments\": \"" + launchArgs + "\",\n" +
-                    "    \"is_dashboard_overlay\": false,\n" +
-                    "    \"image_path\": \"" + image + "\",\n" +
-                    "    \"image_path_capsule\": \"" + capsule + "\",\n" +
-                    "    \"strings\": { \"en_us\": { \"name\": \"New Super Lucky's Tale VR\", \"description\": \"New Super Lucky's Tale with the NSLT-VR mod\" } }\n" +
-                    "  }]\n}\n");
-                return manifest;
-            }
-            catch (Exception ex) { Plugin.Log.LogWarning("OWNVR writing the SteamVR library entry failed: " + ex.Message); return null; }
-        }
-
-        // Flat runs: if SteamVR happens to be running, (re)register the library entry from a background thread as a
-        // background app (which never starts SteamVR), so the VR entry exists without a VR run first.
-        internal static void RegisterFromFlatRun(string manifest)
-        {
-            if (manifest == null || System.Diagnostics.Process.GetProcessesByName("vrserver").Length == 0) return;
-            var t = new System.Threading.Thread(() =>
-            {
-                try
+                if (OpenVR.Applications.IsApplicationInstalled(OldVRAppKey) && System.IO.File.Exists(manifest))
+                    Plugin.Log.LogInfo("OWNVR removed the old 'New Super Lucky's Tale VR' SteamVR library entry: " + OpenVR.Applications.RemoveApplicationManifest(manifest));
+                foreach (var f in new[] { "nsltvr.vrmanifest", "nsltvr_header.jpg", "nsltvr_capsule.jpg" })
                 {
-                    var err = EVRInitError.None;
-                    OpenVR.Init(ref err, EVRApplicationType.VRApplication_Background);
-                    if (err != EVRInitError.None) return;
-                    try { Plugin.Log.LogInfo("SteamVR library entry registered: " + OpenVR.Applications.AddApplicationManifest(manifest, false)); }
-                    finally { OpenVR.Shutdown(); }
+                    string p = System.IO.Path.Combine(dir, f);
+                    if (System.IO.File.Exists(p)) System.IO.File.Delete(p);
                 }
-                catch (Exception e) { Plugin.Log.LogWarning("SteamVR library registration (flat run) failed: " + e.Message); }
-            });
-            t.IsBackground = true;
-            t.Start();
-        }
-
-        private static void RegisterInSteamVRLibrary()
-        {
-            try
-            {
-                string manifest = WriteVRManifest();
-                if (manifest == null) return;
-                var e = OpenVR.Applications.AddApplicationManifest(manifest, false);
-                var key = new System.Text.StringBuilder(256);
-                OpenVR.Applications.GetApplicationKeyByProcessId((uint)System.Diagnostics.Process.GetCurrentProcess().Id, key, 256);
-                Plugin.Log.LogInfo("OWNVR SteamVR library entry '" + VRAppKey + "': " + e + ". This run was launched as '" + key + "'.");
             }
-            catch (Exception ex) { Plugin.Log.LogWarning("OWNVR SteamVR library registration failed: " + ex.Message); }
+            catch (Exception ex) { Plugin.Log.LogWarning("OWNVR removing the old SteamVR library entry failed: " + ex.Message); }
         }
 
         // Runs on Unity's render thread, after the eye cameras' rendering has been processed.

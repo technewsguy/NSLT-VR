@@ -20,7 +20,7 @@ namespace NSLTVR
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "nsltvr.mod";
-        public const string Version = "1.0.2";
+        public const string Version = "1.1.0";
 
         internal static ManualLogSource Log;
         internal static Plugin Instance;
@@ -57,8 +57,6 @@ namespace NSLTVR
         internal static ConfigEntry<float> TitleScreenScale;
         internal static ConfigEntry<float> HubNameSeconds;
         internal static ConfigEntry<bool> RecordUi;
-        internal static ConfigEntry<bool> RegisterInSteamVR;
-        internal static ConfigEntry<bool> VROnlyFromVRShortcut;
         // Keys
         internal static ConfigEntry<KeyCode> KeyRecenter;
         internal static ConfigEntry<KeyCode> KeyScaleDown;
@@ -145,10 +143,6 @@ namespace NSLTVR
                 "Show the game's x-ray silhouette of Lucky through walls in VR. The game decides it from the desktop camera's view, so in VR it shows as a faint ghost in the wrong place.");
             HideScreenGrabEffects = Config.Bind("Camera", "HideScreenGrabEffects", true,
                 "Hide effects that copy the screen (e.g. in Veggie Village) from the VR view. They reuse the desktop camera's picture, which shows as a faint ghost over everything in VR.");
-            VROnlyFromVRShortcut = Config.Bind("General", "VROnlyFromVRShortcut", true,
-                "true = VR only when started from 'New Super Lucky's Tale VR' in SteamVR's library (Steam's normal entry plays flat). false = always VR.");
-            RegisterInSteamVR = Config.Bind("General", "RegisterInSteamVRLibrary", true,
-                "Add \"New Super Lucky's Tale VR\" to SteamVR's library. Starting it from there (instead of from Steam) skips SteamVR's \"Resume Game\" menu at launch.");
             OwnFlipV = Config.Bind("Debug", "OwnFlipV", true, "Stage 4: flip the eye images vertically when handing them to SteamVR (set false if the view is upside down).");
 
             try
@@ -173,16 +167,6 @@ namespace NSLTVR
                 return;
             }
 
-            if (BaselineStage.Value == 4 && VROnlyFromVRShortcut.Value && !LaunchedFromVRShortcut())
-            {
-                // Started from Steam's normal entry: the flat game. VR is the "New Super Lucky's Tale VR" entry in
-                // SteamVR's library, which starts the game with -nsltvr. Keep that entry's manifest file up to date.
-                if (XRSettings.loadedDeviceName != "None" && XRSettings.loadedDeviceName != "") XRSettings.LoadDeviceByName("None");
-                if (RegisterInSteamVR.Value) OwnVR.RegisterFromFlatRun(OwnVR.WriteVRManifest());
-                Log.LogInfo("Started without -nsltvr: playing flat. (Use 'New Super Lucky's Tale VR' in SteamVR's library to play in VR.)");
-                return;
-            }
-
             if (BaselineStage.Value == 4)
             {
                 if (XRSettings.loadedDeviceName != "None" && XRSettings.loadedDeviceName != "") XRSettings.LoadDeviceByName("None");
@@ -190,6 +174,7 @@ namespace NSLTVR
                 DontDestroyOnLoad(o);   // not HideAndDontSave: hidden objects don't get OnApplicationQuit
                 o.AddComponent<OwnVR>();
                 Log.LogInfo("OWNVR: Unity VR off, mod submits frames to SteamVR itself.");
+                CheckSteamVRSection();
                 return;
             }
 
@@ -227,13 +212,32 @@ namespace NSLTVR
             go.AddComponent<VRController>();
         }
 
-        internal const string VRArgument = "-nsltvr";
-
-        internal static bool LaunchedFromVRShortcut()
+        // The installer lists the game in Steam's VR section (installer\SteamVRTag.cs, also compiled into this plugin).
+        // Steam drops that whenever Valve updates the game's store info; then this starts the installer's helper, which
+        // lists it again after Steam closes. Started through WMI so it isn't part of the game's process tree (Steam would
+        // otherwise show the game as running until the helper ends). Windows only: under Proton, Steam runs on Linux.
+        static void CheckSteamVRSection()
         {
-            foreach (var a in Environment.GetCommandLineArgs())
-                if (string.Equals(a, VRArgument, StringComparison.OrdinalIgnoreCase)) return true;
-            return false;
+            var t = new System.Threading.Thread(() =>
+            {
+                try
+                {
+                    if (Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Wine") != null) return;
+                    if (SteamVRTag.IsTagged() != false) return;
+                    string gameDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+                    string helper = System.IO.Path.Combine(gameDir, "NSLT-VR Uninstall.exe");
+                    if (!System.IO.File.Exists(helper)) return;
+                    string cmd = "\"" + helper + "\" /VRTAG-WAIT";
+                    var psi = new System.Diagnostics.ProcessStartInfo("powershell.exe",
+                        "-NoProfile -NonInteractive -WindowStyle Hidden -Command \"([wmiclass]'Win32_Process').Create('" + cmd.Replace("'", "''").Replace("\"", "\\\"") + "') | Out-Null\"");
+                    psi.UseShellExecute = false; psi.CreateNoWindow = true;
+                    System.Diagnostics.Process.Start(psi);
+                    Log.LogInfo("Steam dropped the game from its VR section; it's listed again after Steam closes.");
+                }
+                catch (Exception e) { Log.LogWarning("Steam VR section check failed: " + e.Message); }
+            });
+            t.IsBackground = true;
+            t.Start();
         }
 
         internal static void DemoteAllGameCameras()
