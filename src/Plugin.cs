@@ -20,7 +20,7 @@ namespace NSLTVR
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "nsltvr.mod";
-        public const string Version = "1.1.0";
+        public const string Version = "1.1.1";
 
         internal static ManualLogSource Log;
         internal static Plugin Instance;
@@ -227,11 +227,7 @@ namespace NSLTVR
                     string gameDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
                     string helper = System.IO.Path.Combine(gameDir, "NSLT-VR Uninstall.exe");
                     if (!System.IO.File.Exists(helper)) return;
-                    string cmd = "\"" + helper + "\" /VRTAG-WAIT";
-                    var psi = new System.Diagnostics.ProcessStartInfo("powershell.exe",
-                        "-NoProfile -NonInteractive -WindowStyle Hidden -Command \"([wmiclass]'Win32_Process').Create('" + cmd.Replace("'", "''").Replace("\"", "\\\"") + "') | Out-Null\"");
-                    psi.UseShellExecute = false; psi.CreateNoWindow = true;
-                    System.Diagnostics.Process.Start(psi);
+                    SteamVRTag.StartWaiter(helper);
                     Log.LogInfo("Steam dropped the game from its VR section; it's listed again after Steam closes.");
                 }
                 catch (Exception e) { Log.LogWarning("Steam VR section check failed: " + e.Message); }

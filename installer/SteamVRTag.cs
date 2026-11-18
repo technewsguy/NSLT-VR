@@ -122,9 +122,20 @@ static class SteamVRTag
         }
     }
 
+    // Started through WMI so it is not a child of the caller: Steam would think the game is still running while it
+    // waits, and PowerShell's Start-Process -Wait (Scoop installs) would wait for it too. Note: it doesn't inherit
+    // the caller's environment.
     public static void StartWaiter(string exe)
     {
-        try { Process.Start(new ProcessStartInfo(exe, "/VRTAG-WAIT") { UseShellExecute = false, CreateNoWindow = true }); } catch { }
+        try
+        {
+            string cmd = "\"" + exe + "\" /VRTAG-WAIT";
+            var psi = new ProcessStartInfo("powershell.exe",
+                "-NoProfile -NonInteractive -WindowStyle Hidden -Command \"([wmiclass]'Win32_Process').Create('" + cmd.Replace("'", "''").Replace("\"", "\\\"") + "') | Out-Null\"");
+            psi.UseShellExecute = false; psi.CreateNoWindow = true;
+            using (var p = Process.Start(psi)) p.WaitForExit(15000);
+        }
+        catch { }
     }
 
     // ------------------------------------------------------------ KeyValues helpers
